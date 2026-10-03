@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>便當廚房後台管理系統 - 出餐看板</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <header class="bg-slate-900 text-white px-6 py-4 shadow flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <i class="fa-solid fa-fire-burner text-amber-400 text-2xl"></i>
+      <div>
+        <h1 class="text-xl font-bold">廚房訂單出餐管理看板</h1>
+        <p class="text-xs text-gray-400">跨標籤頁即時自動同步最新訂單狀態</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <a href="index.html" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded text-sm text-gray-300">
+        <i class="fa-solid fa-arrow-left"></i> 前往前台點餐
+      </a>
+      <button onclick="clearCompletedOrders()" class="bg-red-800 hover:bg-red-700 px-3 py-2 rounded text-sm text-white">
+        清除已完成
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-6">
+    <!-- 看板狀態欄位 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- 1. 待製作 -->
+      <div class="bg-white rounded-xl shadow-sm border p-4 flex flex-col h-[80vh]">
+        <div class="flex justify-between items-center border-b pb-3 mb-3">
+          <h2 class="font-bold text-gray-700 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span> 待製作
+          </h2>
+          <span id="countPending" class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+        </div>
+        <div id="pendingList" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+      </div>
+
+      <!-- 2. 製作中 -->
+      <div class="bg-white rounded-xl shadow-sm border p-4 flex flex-col h-[80vh]">
+        <div class="flex justify-between items-center border-b pb-3 mb-3">
+          <h2 class="font-bold text-gray-700 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span> 製作中
+          </h2>
+          <span id="countCooking" class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+        </div>
+        <div id="cookingList" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+      </div>
+
+      <!-- 3. 已完成 (可取餐) -->
+      <div class="bg-white rounded-xl shadow-sm border p-4 flex flex-col h-[80vh]">
+        <div class="flex justify-between items-center border-b pb-3 mb-3">
+          <h2 class="font-bold text-gray-700 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-green-500"></span> 已完成 (可取餐)
+          </h2>
+          <span id="countDone" class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+        </div>
+        <div id="doneList" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function loadOrders() {
+      return JSON.parse(localStorage.getItem("bento_orders") || "[]");
+    }
+
+    function saveOrders(orders) {
+      localStorage.setItem("bento_orders", JSON.stringify(orders));
+      renderBoard();
+    }
+
+    function updateStatus(orderId, newStatus) {
+      const orders = loadOrders();
+      const target = orders.find(o => o.orderId === orderId);
+      if(target) {
+        target.status = newStatus;
+        saveOrders(orders);
+      }
+    }
+
+    function clearCompletedOrders() {
+      if(!confirm("確定要清理所有已完成的訂單嗎？")) return;
+      const orders = loadOrders().filter(o => o.status !== "已完成");
+      saveOrders(orders);
+    }
+
+    function renderOrderCard(order) {
+      const itemsList = order.items.map(it => `
+        <li class="flex justify-between text-sm py-1 border-b border-gray-100">
+          <span class="font-semibold text-gray-800">${it.name}</span>
+          <span class="font-bold text-amber-600">x${it.qty}</span>
+        </li>
+      `).join("");
+
+      let actionBtn = "";
+      if(order.status === "待製作") {
+        actionBtn = `
+          <button onclick="updateStatus('${order.orderId}', '製作中')" class="w-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-2 rounded transition">
+            開始製作
+          </button>
+        `;
+      } else if(order.status === "製作中") {
+        actionBtn = `
+          <button onclick="updateStatus('${order.orderId}', '已完成')" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 rounded transition">
+            完成出餐
+          </button>
+        `;
+      } else {
+        actionBtn = `
+          <div class="text-center text-xs text-green-600 font-bold py-1 bg-green-50 rounded">已交付顧客</div>
+        `;
+      }
+
+      return `
+        <div class="bg-gray-50 border rounded-lg p-3 shadow-sm hover:shadow transition">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <span class="text-xs font-mono font-bold bg-gray-200 px-2 py-0.5 rounded text-gray-700">${order.orderId}</span>
+              <div class="text-sm font-bold mt-1 text-gray-900">${order.name} (${order.phone})</div>
+            </div>
+            <span class="text-xs text-gray-400 font-mono">${order.time}</span>
+          </div>
+
+          <ul class="my-2 bg-white rounded p-2 border border-gray-100">${itemsList}</ul>
+
+          ${order.note !== "無" ? `<div class="text-xs text-red-600 bg-red-50 p-1.5 rounded mb-2"><strong>備註：</strong>${order.note}</div>` : ''}
+
+          <div class="flex justify-between items-center text-xs font-bold text-gray-600 mb-2">
+            <span>總金額</span>
+            <span>NT$ ${order.total}</span>
+          </div>
+
+          ${actionBtn}
+        </div>
+      `;
+    }
+
+    function renderBoard() {
+      const orders = loadOrders();
+
+      const pending = orders.filter(o => o.status === "待製作");
+      const cooking = orders.filter(o => o.status === "製作中");
+      const done = orders.filter(o => o.status === "已完成");
+
+      document.getElementById("countPending").innerText = pending.length;
+      document.getElementById("countCooking").innerText = cooking.length;
+      document.getElementById("countDone").innerText = done.length;
+
+      document.getElementById("pendingList").innerHTML = pending.length ? pending.map(renderOrderCard).join("") : '<div class="text-center text-xs text-gray-400 py-8">無待製作訂單</div>';
+      document.getElementById("cookingList").innerHTML = cooking.length ? cooking.map(renderOrderCard).join("") : '<div class="text-center text-xs text-gray-400 py-8">無製作中訂單</div>';
+      document.getElementById("doneList").innerHTML = done.length ? done.map(renderOrderCard).join("") : '<div class="text-center text-xs text-gray-400 py-8">無已完成訂單</div>';
+    }
+
+    // 監聽前台訂單變動（跨分頁即時更新）
+    window.addEventListener("storage", (e) => {
+      if(e.key === "bento_orders") {
+        renderBoard();
+      }
+    });
+
+    renderBoard();
+  </script>
+</body>
+</html>

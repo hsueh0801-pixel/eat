@@ -3,327 +3,233 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>美味便當專賣店 - 線上訂餐與廚房出餐系統</title>
-  <style>
-    :root {
-      --primary: #c2392a;
-      --primary-dark: #9b281b;
-      --bg: #f8f6f2;
-      --card-bg: #ffffff;
-      --text: #333333;
-      --gray: #666666;
-      --border: #e0ded9;
-      --success: #28a745;
-      --warning: #f39c12;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
-    header { background: var(--primary); color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    header h1 { font-size: 1.25rem; font-weight: 700; }
-    .nav-tabs { display: flex; gap: 8px; }
-    .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: 0.2s; }
-    .nav-btn.active { background: white; color: var(--primary); }
-    .container { max-width: 1080px; margin: 24px auto; padding: 0 16px; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    
-    /* 點餐介面 */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; margin-bottom: 30px; }
-    .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
-    .card:hover { transform: translateY(-3px); }
-    .card-body { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; }
-    .badge { align-self: flex-start; background: #ffeaea; color: var(--primary); font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 6px; }
-    .dish-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .dish-desc { font-size: 0.85rem; color: var(--gray); margin-bottom: 12px; flex-grow: 1; }
-    .dish-footer { display: flex; justify-content: space-between; align-items: center; }
-    .dish-price { font-size: 1.2rem; color: var(--primary); font-weight: 800; }
-    .btn-add { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-    .btn-add:hover { background: var(--primary-dark); }
-
-    /* 購物車結帳區 */
-    .checkout-box { background: white; border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
-    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); }
-    .form-group { margin-top: 14px; }
-    .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; }
-    .btn-order { background: var(--success); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.1rem; font-weight: 700; margin-top: 20px; cursor: pointer; }
-
-    /* 後台管理介面 */
-    .admin-stats { display: flex; gap: 16px; margin-bottom: 20px; }
-    .stat-card { background: white; padding: 16px; border-radius: 8px; flex: 1; border: 1px solid var(--border); text-align: center; }
-    .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
-    .order-card { background: white; border-radius: 10px; border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-    .order-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 10px; }
-    .status-tag { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-cooking { background: #cce5ff; color: #004085; }
-    .status-completed { background: #d4edda; color: #155724; }
-    .btn-action { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-left: 8px; }
-    .btn-cook { background: #007bff; color: white; }
-    .btn-finish { background: var(--success); color: white; }
-    .btn-del { background: #dc3545; color: white; }
-  </style>
+  <title>美味便當專賣店 - 線上點餐</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800">
 
-  <header>
-    <h1>🍱 便當專賣店</h1>
-    <div class="nav-tabs">
-      <button class="nav-btn active" onclick="switchTab('customer')">顧客點餐</button>
-      <button class="nav-btn" onclick="switchTab('admin')">廚房後台</button>
+  <!-- 頂部導航 -->
+  <header class="bg-amber-600 text-white shadow sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-xl font-bold flex items-center gap-2">
+        <i class="fa-solid fa-bowl-rice"></i> 美味便當專賣店
+      </h1>
+      <div class="flex items-center gap-3">
+        <a href="admin.html" class="text-xs bg-amber-700 hover:bg-amber-800 text-white px-3 py-1.5 rounded-lg transition">
+          <i class="fa-solid fa-kitchen-set"></i> 後台廚房
+        </a>
+        <button onclick="toggleCartModal()" class="relative bg-white text-amber-600 px-3 py-1.5 rounded-lg font-medium shadow hover:bg-amber-50">
+          <i class="fa-solid fa-cart-shopping"></i> 購物車
+          <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">0</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <div class="container">
-    <!-- 顧客點餐前端 -->
-    <div id="customerTab" class="tab-content active">
-      <h2 style="margin-bottom: 16px;">精選餐盒</h2>
-      <div class="grid" id="menuGrid"></div>
+  <!-- 菜單分類篩選 -->
+  <div class="max-w-6xl mx-auto px-4 py-4 flex gap-2 overflow-x-auto">
+    <button onclick="filterCategory('全部')" class="cat-btn bg-amber-600 text-white px-4 py-1.5 rounded-full text-sm font-medium">全部</button>
+    <button onclick="filterCategory('燒烤便當')" class="cat-btn bg-white text-gray-600 border px-4 py-1.5 rounded-full text-sm font-medium">燒烤便當</button>
+    <button onclick="filterCategory('日式炸物')" class="cat-btn bg-white text-gray-600 border px-4 py-1.5 rounded-full text-sm font-medium">日式炸物</button>
+    <button onclick="filterCategory('咖哩系列')" class="cat-btn bg-white text-gray-600 border px-4 py-1.5 rounded-full text-sm font-medium">咖哩系列</button>
+  </div>
 
-      <div class="checkout-box">
-        <h3>🛒 購物車</h3>
-        <div id="cartItems" style="margin: 12px 0;"><p style="color: var(--gray);">購物車目前為空</p></div>
-        <div style="font-size: 1.1rem; font-weight: 700; text-align: right; margin-top: 10px;">
-          總金額：NT$ <span id="cartTotal">0</span>
+  <!-- 便當列表 -->
+  <main class="max-w-6xl mx-auto px-4 pb-20">
+    <div id="menuGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <!-- 餐點卡片由 JavaScript 動態生成 -->
+    </div>
+  </main>
+
+  <!-- 購物車彈窗 Modal -->
+  <div id="cartModal" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+    <div class="bg-white w-full max-w-md h-full flex flex-col shadow-xl animate-slide-in">
+      <div class="p-4 border-b flex justify-between items-center bg-gray-100">
+        <h2 class="font-bold text-lg"><i class="fa-solid fa-list-check"></i> 點餐清單</h2>
+        <button onclick="toggleCartModal()" class="text-gray-500 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3">
+        <!-- 購物車商品 -->
+      </div>
+
+      <div class="p-4 border-t bg-gray-50 space-y-3">
+        <div class="flex justify-between font-bold text-lg">
+          <span>總金額</span>
+          <span class="text-amber-600">NT$ <span id="cartTotal">0</span></span>
         </div>
         
-        <div class="form-group">
-          <label>顧客稱呼 / 桌號</label>
-          <input type="text" id="custName" placeholder="例如：陳先生 / 外帶 / 3號桌">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">訂購人姓名 / 稱呼</label>
+          <input id="custName" type="text" class="w-full border rounded-lg p-2 text-sm" placeholder="例如：陳先生">
         </div>
-        <div class="form-group">
-          <label>聯絡電話 / 備註</label>
-          <input type="text" id="custPhone" placeholder="例如：0912-345-678（不加蔥）">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">聯絡電話</label>
+          <input id="custPhone" type="tel" class="w-full border rounded-lg p-2 text-sm" placeholder="例如：0912345678">
         </div>
-        <button class="btn-order" onclick="submitOrder()">送出訂單</button>
-      </div>
-    </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">備註需求 (如飯少、加辣等)</label>
+          <input id="custNote" type="text" class="w-full border rounded-lg p-2 text-sm" placeholder="若無可不填">
+        </div>
 
-    <!-- 廚房出餐後台 -->
-    <div id="adminTab" class="tab-content">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-        <h2>廚房製作進度看板</h2>
-        <button onclick="clearCompleted()" style="padding: 6px 12px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">清除已出餐訂單</button>
+        <button onclick="submitOrder()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg shadow transition">
+          確認送出訂單
+        </button>
       </div>
-
-      <div class="admin-stats">
-        <div class="stat-card"><div>待製作</div><div class="stat-num" id="countPending">0</div></div>
-        <div class="stat-card"><div>製作中</div><div class="stat-num" id="countCooking">0</div></div>
-        <div class="stat-card"><div>已完成</div><div class="stat-num" id="countDone">0</div></div>
-      </div>
-
-      <div id="orderList"></div>
     </div>
   </div>
 
   <script>
-    // 菜單資料
+    // 依據圖片擷取的便當菜單資料
     const menuData = [
-      { id: 1, name: "烤香腸飯", price: 80, badge: "", desc: "經典烤香腸佐時蔬配菜" },
-      { id: 2, name: "燒烤雞腿飯", price: 95, badge: "人氣熱銷", desc: "獨家特調蜜汁醬烤雞腿" },
-      { id: 3, name: "烤松阪豬飯", price: 95, badge: "", desc: "嚴選黃金六兩松阪豬" },
-      { id: 4, name: "秘製燒烤豬排飯", price: 90, badge: "店長推薦", desc: "厚切豬排慢火燒烤入味" },
-      { id: 5, name: "日式豬排飯", price: 85, badge: "", desc: "日式香酥黃金大豬排" },
-      { id: 6, name: "日式唐揚雞飯", price: 90, badge: "", desc: "外皮酥脆多汁軟嫩唐揚雞" },
-      { id: 7, name: "日式炸雞腿飯", price: 95, badge: "店長推薦", desc: "超厚實金黃酥炸大雞腿" },
-      { id: 8, name: "日式雞排飯", price: 80, badge: "", desc: "酥嫩大雞排搭配豐富配菜" },
-      { id: 9, name: "醬燒牛/豚肉飯", price: 90, badge: "", desc: "濃郁日式醬汁翻炒肉片" },
-      { id: 10, name: "唐揚雞咖哩飯", price: 100, badge: "", desc: "濃郁日式咖哩搭配唐揚雞" },
-      { id: 11, name: "炸豬排咖哩飯", price: 100, badge: "", desc: "厚切炸豬排佐香濃咖哩" },
-      { id: 12, name: "炸雞排咖哩飯", price: 95, badge: "", desc: "酥脆大雞排佐香濃咖哩" }
+      { id: "B01", name: "烤香腸飯", price: 80, cat: "燒烤便當", rec: false, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop" },
+      { id: "B02", name: "燒烤雞腿飯", price: 95, cat: "燒烤便當", rec: false, img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500&auto=format&fit=crop" },
+      { id: "B03", name: "烤松阪豬飯", price: 95, cat: "燒烤便當", rec: false, img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&auto=format&fit=crop" },
+      { id: "B04", name: "秘製燒烤豬排飯", price: 90, cat: "燒烤便當", rec: true, img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&auto=format&fit=crop" },
+      { id: "B05", name: "日式豬排飯", price: 85, cat: "日式炸物", rec: false, img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500&auto=format&fit=crop" },
+      { id: "B06", name: "日式唐揚雞飯", price: 90, cat: "日式炸物", rec: false, img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=500&auto=format&fit=crop" },
+      { id: "B07", name: "日式炸雞腿飯", price: 95, cat: "日式炸物", rec: true, img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&auto=format&fit=crop" },
+      { id: "B08", name: "日式雞排飯", price: 80, cat: "日式炸物", rec: false, img: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500&auto=format&fit=crop" },
+      { id: "B09", name: "日式燒肉飯", price: 85, cat: "燒烤便當", rec: false, img: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=500&auto=format&fit=crop" },
+      { id: "B10", name: "唐揚雞咖哩飯", price: 95, cat: "咖哩系列", rec: false, img: "https://images.unsplash.com/photo-1574484284002-952d92456975?w=500&auto=format&fit=crop" },
+      { id: "B11", name: "日式豬排咖哩飯", price: 95, cat: "咖哩系列", rec: false, img: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&auto=format&fit=crop" },
+      { id: "B12", name: "日式雞排咖哩飯", price: 90, cat: "咖哩系列", rec: false, img: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=500&auto=format&fit=crop" }
     ];
 
-    let cart = {};
+    let cart = [];
 
-    // 渲染菜單
-    function renderMenu() {
-      const grid = document.getElementById('menuGrid');
-      grid.innerHTML = menuData.map(item => `
-        <div class="card">
-          <div class="card-body">
-            ${item.badge ? `<span class="badge">${item.badge}</span>` : '<span style="height:19px;"></span>'}
-            <div class="dish-title">${item.name}</div>
-            <div class="dish-desc">${item.desc}</div>
-            <div class="dish-footer">
-              <span class="dish-price">NT$ ${item.price}</span>
-              <button class="btn-add" onclick="addToCart(${item.id})">+ 點餐</button>
+    function renderMenu(items) {
+      const grid = document.getElementById("menuGrid");
+      grid.innerHTML = items.map(b => `
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+          <div class="relative aspect-square overflow-hidden bg-gray-100">
+            <img src="${b.img}" alt="${b.name}" class="w-full h-full object-cover">
+            ${b.rec ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold shadow">推薦</span>' : ''}
+          </div>
+          <div class="p-3 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-sm md:text-base text-gray-800">${b.name}</h3>
+              <p class="text-amber-600 font-extrabold text-base md:text-lg mt-1">NT$ ${b.price}</p>
             </div>
+            <button onclick="addToCart('${b.id}')" class="mt-3 w-full bg-amber-500 hover:bg-amber-600 text-white py-1.5 rounded-lg text-sm font-medium flex items-center justify-center gap-1">
+              <i class="fa-solid fa-plus"></i> 加入
+            </button>
           </div>
         </div>
-      `).join('');
+      `).join("");
+    }
+
+    function filterCategory(category) {
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if(btn.innerText === category) {
+          btn.className = "cat-btn bg-amber-600 text-white px-4 py-1.5 rounded-full text-sm font-medium";
+        } else {
+          btn.className = "cat-btn bg-white text-gray-600 border px-4 py-1.5 rounded-full text-sm font-medium";
+        }
+      });
+      if(category === "全部") renderMenu(menuData);
+      else renderMenu(menuData.filter(x => x.cat === category));
     }
 
     function addToCart(id) {
-      cart[id] = (cart[id] || 0) + 1;
-      renderCart();
+      const item = menuData.find(m => m.id === id);
+      const existing = cart.find(c => c.id === id);
+      if(existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+      updateCartUI();
     }
 
     function changeQty(id, delta) {
-      if (!cart[id]) return;
-      cart[id] += delta;
-      if (cart[id] <= 0) delete cart[id];
-      renderCart();
+      const item = cart.find(c => c.id === id);
+      if(!item) return;
+      item.qty += delta;
+      if(item.qty <= 0) {
+        cart = cart.filter(c => c.id !== id);
+      }
+      updateCartUI();
     }
 
-    function renderCart() {
-      const container = document.getElementById('cartItems');
-      const keys = Object.keys(cart);
-      if (keys.length === 0) {
-        container.innerHTML = '<p style="color: var(--gray);">購物車目前為空</p>';
-        document.getElementById('cartTotal').innerText = '0';
+    function updateCartUI() {
+      const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      const totalPrice = cart.reduce((sum, item) => sum + item.qty * item.price, 0);
+      document.getElementById("cartCount").innerText = totalCount;
+      document.getElementById("cartTotal").innerText = totalPrice;
+
+      const cartItemsDiv = document.getElementById("cartItems");
+      if(cart.length === 0) {
+        cartItemsDiv.innerHTML = '<div class="text-center text-gray-400 py-10">購物車目前是空的</div>';
         return;
       }
-      let total = 0;
-      container.innerHTML = keys.map(id => {
-        const item = menuData.find(m => m.id == id);
-        const subtotal = item.price * cart[id];
-        total += subtotal;
-        return `
-          <div class="cart-item">
-            <div>
-              <strong>${item.name}</strong>
-              <div style="font-size:0.85rem; color:var(--gray);">NT$ ${item.price} × ${cart[id]}</div>
-            </div>
-            <div>
-              <button onclick="changeQty(${id}, -1)" style="padding:2px 8px;">-</button>
-              <span style="margin: 0 6px;">${cart[id]}</span>
-              <button onclick="changeQty(${id}, 1)" style="padding:2px 8px;">+</button>
-            </div>
+
+      cartItemsDiv.innerHTML = cart.map(item => `
+        <div class="flex justify-between items-center border-b pb-2">
+          <div>
+            <div class="font-medium text-sm">${item.name}</div>
+            <div class="text-xs text-gray-500">NT$ ${item.price}</div>
           </div>
-        `;
-      }).join('');
-      document.getElementById('cartTotal').innerText = total;
+          <div class="flex items-center gap-2">
+            <button onclick="changeQty('${item.id}', -1)" class="w-6 h-6 rounded bg-gray-200 text-gray-700 flex items-center justify-center">-</button>
+            <span class="text-sm font-bold w-4 text-center">${item.qty}</span>
+            <button onclick="changeQty('${item.id}', 1)" class="w-6 h-6 rounded bg-gray-200 text-gray-700 flex items-center justify-center">+</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleCartModal() {
+      const modal = document.getElementById("cartModal");
+      modal.classList.toggle("hidden");
     }
 
     function submitOrder() {
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const keys = Object.keys(cart);
-      if (keys.length === 0) return alert('請先選擇餐點！');
-      if (!name) return alert('請填寫顧客稱呼或桌號！');
+      if(cart.length === 0) {
+        alert("購物車是空的，請先挑選便當！");
+        return;
+      }
+      const name = document.getElementById("custName").value.trim();
+      const phone = document.getElementById("custPhone").value.trim();
+      const note = document.getElementById("custNote").value.trim();
 
-      const items = keys.map(id => {
-        const item = menuData.find(m => m.id == id);
-        return { name: item.name, price: item.price, qty: cart[id] };
-      });
-      const total = items.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
-      const newOrder = {
-        id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
-        name,
-        phone: phone || '無備註',
-        items,
-        total,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        status: 'pending' // pending -> cooking -> completed
-      };
-
-      const orders = JSON.parse(localStorage.getItem('bento_orders') || '[]');
-      orders.unshift(newOrder);
-      localStorage.setItem('bento_orders', JSON.stringify(orders));
-
-      cart = {};
-      document.getElementById('custName').value = '';
-      document.getElementById('custPhone').value = '';
-      renderCart();
-      alert('訂單已送出！廚房將立即備餐。');
-      renderOrders();
-    }
-
-    // 渲染後台看板
-    function renderOrders() {
-      const orders = JSON.parse(localStorage.getItem('bento_orders') || '[]');
-      const container = document.getElementById('orderList');
-      
-      let pending = 0, cooking = 0, completed = 0;
-      orders.forEach(o => {
-        if (o.status === 'pending') pending++;
-        else if (o.status === 'cooking') cooking++;
-        else if (o.status === 'completed') completed++;
-      });
-      document.getElementById('countPending').innerText = pending;
-      document.getElementById('countCooking').innerText = cooking;
-      document.getElementById('countDone').innerText = completed;
-
-      if (orders.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:var(--gray); padding: 40px 0;">目前沒有訂單</p>';
+      if(!name || !phone) {
+        alert("請填寫訂購人姓名與聯絡電話！");
         return;
       }
 
-      container.innerHTML = orders.map((order, idx) => {
-        const statusMap = {
-          pending: '<span class="status-tag status-pending">待製作</span>',
-          cooking: '<span class="status-tag status-cooking">製作中</span>',
-          completed: '<span class="status-tag status-completed">已完成</span>'
-        };
+      const order = {
+        orderId: "ORD-" + Date.now().toString().slice(-6),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        name,
+        phone,
+        note: note || "無",
+        items: cart,
+        total: cart.reduce((sum, item) => sum + item.qty * item.price, 0),
+        status: "待製作"
+      };
 
-        const itemStr = order.items.map(i => `${i.name} × ${i.qty}`).join('、 ');
+      // 讀取既有訂單並追加
+      const orders = JSON.parse(localStorage.getItem("bento_orders") || "[]");
+      orders.unshift(order);
+      localStorage.setItem("bento_orders", JSON.stringify(orders));
 
-        return `
-          <div class="order-card">
-            <div class="order-header">
-              <div>
-                <strong>${order.id}</strong> - ${order.name} (${order.phone})
-                <div style="font-size:0.8rem; color:var(--gray); margin-top:2px;">下單時間: ${order.time}</div>
-              </div>
-              <div>${statusMap[order.status]}</div>
-            </div>
-            <div style="margin: 8px 0; font-size: 0.95rem;">
-              <strong>餐點：</strong>${itemStr}
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-              <span style="font-weight:700; color:var(--primary);">金額: NT$ ${order.total}</span>
-              <div>
-                ${order.status === 'pending' ? `<button class="btn-action btn-cook" onclick="updateStatus(${idx}, 'cooking')">開始製作</button>` : ''}
-                ${order.status === 'cooking' ? `<button class="btn-action btn-finish" onclick="updateStatus(${idx}, 'completed')">完成餐點</button>` : ''}
-                <button class="btn-action btn-del" onclick="deleteOrder(${idx})">刪除</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      // 清空購物車
+      cart = [];
+      updateCartUI();
+      toggleCartModal();
+      document.getElementById("custName").value = "";
+      document.getElementById("custPhone").value = "";
+      document.getElementById("custNote").value = "";
+
+      alert(`訂單送出成功！您的訂單編號為：${order.orderId}。\n後台廚房已即時收到訂單！`);
     }
 
-    function updateStatus(index, newStatus) {
-      const orders = JSON.parse(localStorage.getItem('bento_orders') || '[]');
-      orders[index].status = newStatus;
-      localStorage.setItem('bento_orders', JSON.stringify(orders));
-      renderOrders();
-    }
-
-    function deleteOrder(index) {
-      if (!confirm('確定刪除此筆訂單？')) return;
-      const orders = JSON.parse(localStorage.getItem('bento_orders') || '[]');
-      orders.splice(index, 1);
-      localStorage.setItem('bento_orders', JSON.stringify(orders));
-      renderOrders();
-    }
-
-    function clearCompleted() {
-      let orders = JSON.parse(localStorage.getItem('bento_orders') || '[]');
-      orders = orders.filter(o => o.status !== 'completed');
-      localStorage.setItem('bento_orders', JSON.stringify(orders));
-      renderOrders();
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      if (tab === 'customer') {
-        document.getElementById('customerTab').classList.add('active');
-        document.querySelectorAll('.nav-btn')[0].classList.add('active');
-      } else {
-        document.getElementById('adminTab').classList.add('active');
-        document.querySelectorAll('.nav-btn')[1].classList.add('active');
-        renderOrders();
-      }
-    }
-
-    // 初始化
-    renderMenu();
-    renderOrders();
-    // 跨分頁即時更新
-    window.addEventListener('storage', () => renderOrders());
+    // 初始化渲染
+    renderMenu(menuData);
+    updateCartUI();
   </script>
 </body>
 </html>
